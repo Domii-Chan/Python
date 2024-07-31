@@ -1,0 +1,109 @@
+import os
+import re
+
+class Person:
+    def __init__(self, first, last, age, phone_number):
+        self.first = first
+        self.last = last
+        self.age = age
+        self.phone_number = phone_number
+
+    def full_name(self):
+        return f'{self.first} {self.last}'
+
+    def __str__(self):
+        return f"{self.first} {self.last} : {self.age} : {self.phone_number}"
+
+contacts = list()
+znaky = re.compile("[@._!#$%^&*+()<>?/\|}{~:,-]")
+
+if os.path.isfile("pojistenci.csv"):
+    with open("pojistenci.csv") as f:
+        csv_list = f.readlines()
+        for contact_line in csv_list:
+            contact_data = contact_line.rstrip().split(",")
+            contact = Person(contact_data[0],
+                             contact_data[1], 
+                             contact_data[2],
+                             contact_data[3])
+            contacts.append(contact)
+        
+users_input = ""
+
+print("保険アプリケーションへようこそ")
+
+while users_input != "q":
+    print("オプションの選択")
+    print("1 - 保険契約者を作成")
+    print("2 - すべての保険契約者を表示")
+    print("3 - 特定の保険契約者を検索")
+    print("q - アプリケーションを終了")
+    users_input = input("オプションを選択してください: ")
+    
+    if users_input == "1":
+        
+        print("保険契約者の情報を入力してください")
+        while True:
+            first_name = input("名前 = ")
+            if any(map(str.isdigit, first_name)):
+                print("名前に数字を含めることはできません")
+            elif (znaky.search(first_name) != None):
+                print("名前に特殊文字を含めることはできません")
+            elif first_name.strip() == "":
+                print("フィールドを入力してください")
+            else:
+                break
+        while True:
+            last_name = input("姓 = ")
+            if any(map(str.isdigit, last_name)):
+                print("姓に数字を含めることはできません")
+            elif (znaky.search(last_name) != None):
+                print("姓に特殊文字を含めることはできません")
+            elif last_name.strip() == "":
+                print("フィールドを入力してください")
+            else:
+                break              
+        while True:
+            age = input("年齢 = ")
+            if any(map(str.isalpha, age)):
+                print("フィールドに文字を含めることはできません")
+            elif (znaky.search(age) != None):
+                print("フィールドに特殊文字を含めることはできません")
+            elif age.strip() == "":
+                print("フィールドを入力してください")
+            else:
+                break
+        while True:
+            phone_number = input("電話番号 = ")
+            if any(map(str.isalpha, phone_number)):
+                print("フィールドに文字を含めることはできません")
+            elif (znaky.search(phone_number) != None):
+                print("フィールドに特殊文字を含めることはできません")
+            elif phone_number.strip() == "":
+                print("フィールドを入力してください")
+            else:
+                break
+        our_contact = Person(first_name, last_name, age, phone_number)
+        contacts.append(our_contact)
+        print("ありがとうございます、保険契約者が正常に作成されました")
+             
+    elif users_input == "2":
+        for contact in contacts:
+            print(contact)
+        input("すべての保険契約者が表示されました。続行するにはEnterを押してください")
+    elif users_input == "3":
+        to_lookup = input("保険契約者を検索するための名前を入力してください\n")
+        for contact in contacts:
+            if to_lookup in contact.full_name():
+                print(contact)
+            else:
+                print("ユーザーが見つかりませんでした")
+
+    elif users_input.lower() == "q":
+        break
+
+with open("pojistenci.csv", "w") as f:
+    for contact in contacts:
+        f.write(f"{contact.first},{contact.last},{contact.age},{contact.phone_number}\n")
+
+print("保険アプリケーションをご利用いただき、ありがとうございます")
